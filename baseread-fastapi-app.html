@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>baseread-fastapi-app</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=boska@400,500,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2; --color-surface:#f9f8f5; --color-surface-2:#fbfbf9; --color-surface-offset:#edeae5; --color-border:#d4d1ca; --color-divider:#dcd9d5;
+      --color-text:#28251d; --color-text-muted:#66645f; --color-text-faint:#9a9892; --color-text-inverse:#f9f8f4;
+      --color-primary:#0f5a49; --color-primary-hover:#0c4e40; --color-primary-highlight:#dbe7e1; --color-success:#437a22; --color-warning:#964219; --color-error:#a12c7b;
+      --radius-sm:.375rem; --radius-md:.75rem; --radius-lg:1rem; --radius-xl:1.25rem; --radius-full:9999px;
+      --shadow-sm:0 1px 2px rgba(30,26,20,.06); --shadow-md:0 10px 30px rgba(30,26,20,.08); --shadow-lg:0 20px 60px rgba(30,26,20,.12);
+      --font-display:'Boska', Georgia, serif; --font-body:'Satoshi', Inter, sans-serif;
+      --transition:180ms cubic-bezier(.16,1,.3,1);
+      --content:1200px;
+    }
+    [data-theme="dark"] {
+      --color-bg:#171614; --color-surface:#1c1b19; --color-surface-2:#201f1d; --color-surface-offset:#2a2926; --color-border:#393836; --color-divider:#262523;
+      --color-text:#e2dfd6; --color-text-muted:#b6b2a8; --color-text-faint:#7d7a72; --color-text-inverse:#171614;
+      --color-primary:#66b29c; --color-primary-hover:#4f9b86; --color-primary-highlight:#253530; --shadow-sm:0 1px 2px rgba(0,0,0,.2); --shadow-md:0 10px 30px rgba(0,0,0,.28); --shadow-lg:0 20px 60px rgba(0,0,0,.4);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;scroll-behavior:smooth}
+    body{margin:0;min-height:100dvh;font:var(--text-base)/1.6 var(--font-body);background:var(--color-bg);color:var(--color-text)}
+    img,svg{display:block;max-width:100%} button,input,select{font:inherit} button{cursor:pointer}
+    a{color:inherit} .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+    .container{width:min(calc(100% - 2rem),var(--content));margin-inline:auto}
+    .topbar{position:sticky;top:0;z-index:30;background:color-mix(in srgb, var(--color-bg) 86%, transparent);backdrop-filter:blur(16px);border-bottom:1px solid color-mix(in srgb,var(--color-text) 10%, transparent)}
+    .topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) 0;gap:var(--space-4)}
+    .brand{display:flex;align-items:center;gap:var(--space-3);font-weight:700;text-decoration:none}
+    .logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--color-primary),color-mix(in srgb,var(--color-primary) 70%, white));display:grid;place-items:center;color:var(--color-text-inverse);box-shadow:var(--shadow-sm)}
+    .logo svg{width:24px;height:24px}
+    .brand-copy strong{display:block;font-size:var(--text-sm);letter-spacing:.18em;text-transform:uppercase}
+    .brand-copy span{display:block;color:var(--color-text-muted);font-size:var(--text-xs)}
+    .icon-btn{min-width:44px;min-height:44px;padding:0 var(--space-3);border-radius:var(--radius-full);border:1px solid color-mix(in srgb,var(--color-text) 10%, transparent);background:var(--color-surface);display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);transition:all var(--transition)}
+    .icon-btn:hover,.btn:hover{transform:translateY(-1px)}
+    .hero{padding:clamp(3rem,6vw,6rem) 0 var(--space-10)}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--space-8);align-items:end}
+    .eyebrow{font-size:var(--text-xs);letter-spacing:.28em;text-transform:uppercase;color:var(--color-primary);font-weight:700;margin-bottom:var(--space-4)}
+    h1{font:700 var(--text-2xl)/1.02 var(--font-display);margin:0 0 var(--space-4);max-width:12ch}
+    .hero p{max-width:62ch;color:var(--color-text-muted);margin:0 0 var(--space-6)}
+    .hero-card,.panel,.metric,.table-card,.gene-card{background:var(--color-surface);border:1px solid color-mix(in srgb,var(--color-text) 9%, transparent);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm)}
+    .hero-card{padding:var(--space-6);display:grid;gap:var(--space-4);background:linear-gradient(180deg,var(--color-surface),var(--color-surface-2))}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3)}
+    .hero-stat{padding:var(--space-4);border-radius:var(--radius-lg);background:var(--color-surface-offset)}
+    .hero-stat strong{display:block;font-size:var(--text-lg)}
+    .hero-stat span{font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;letter-spacing:.14em}
+    main{padding-bottom:var(--space-16)}
+    .app-grid{display:grid;grid-template-columns:minmax(320px,420px) minmax(0,1fr);gap:var(--space-8);align-items:start}
+    .panel{padding:var(--space-6);position:sticky;top:88px}
+    .panel h2,.results-head h2{font-size:var(--text-lg);margin:0 0 var(--space-2)}
+    .muted{color:var(--color-text-muted)}
+    .field{display:grid;gap:var(--space-2);margin-bottom:var(--space-4)}
+    label{font-size:var(--text-sm);font-weight:700}
+    input[type="file"], select, input[type="number"]{width:100%;padding:.9rem 1rem;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-lg);color:var(--color-text)}
+    .check{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);border-radius:var(--radius-lg);background:var(--color-surface-2)}
+    .actions{display:flex;gap:var(--space-3);flex-wrap:wrap;margin-top:var(--space-5)}
+    .btn{min-height:48px;padding:0 1rem;border-radius:var(--radius-full);border:1px solid transparent;font-weight:700;transition:all var(--transition);display:inline-flex;align-items:center;justify-content:center;gap:.55rem;text-decoration:none}
+    .btn-primary{background:var(--color-primary);color:var(--color-text-inverse);box-shadow:var(--shadow-sm)}
+    .btn-secondary{background:var(--color-surface);border-color:color-mix(in srgb,var(--color-text) 10%, transparent)}
+    .status-list{display:grid;gap:var(--space-3);margin-top:var(--space-6)}
+    .status-item{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-4);background:var(--color-surface-2);border-radius:var(--radius-lg);border:1px solid color-mix(in srgb,var(--color-text) 8%, transparent)}
+    .dot{width:12px;height:12px;border-radius:50%;background:var(--color-text-faint)} .done{background:var(--color-success)} .live{background:var(--color-warning)}
+    .results{display:grid;gap:var(--space-5)}
+    .results-head{display:flex;align-items:end;justify-content:space-between;gap:var(--space-4);margin-bottom:var(--space-2)}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4)}
+    .metric{padding:var(--space-5)}
+    .metric strong{display:block;font-size:var(--text-xl);line-height:1.1}
+    .metric span{font-size:var(--text-xs);letter-spacing:.18em;text-transform:uppercase;color:var(--color-text-muted)}
+    .table-card{overflow:hidden}
+    table{width:100%;border-collapse:collapse;font-size:var(--text-sm)}
+    th,td{padding:1rem;border-bottom:1px solid color-mix(in srgb,var(--color-text) 8%, transparent);text-align:left;vertical-align:top}
+    th{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.16em;color:var(--color-text-muted);background:var(--color-surface-2)}
+    .badge{display:inline-flex;align-items:center;border-radius:var(--radius-full);padding:.35rem .7rem;font-size:var(--text-xs);font-weight:700;letter-spacing:.04em}
+    .b-path{background:color-mix(in srgb,var(--color-error) 12%, var(--color-surface));color:var(--color-error)}
+    .b-lp{background:color-mix(in srgb,var(--color-warning) 16%, var(--color-surface));color:var(--color-warning)}
+    .b-vus{background:color-mix(in srgb,var(--color-primary) 12%, var(--color-surface));color:var(--color-primary)}
+    .b-benign{background:color-mix(in srgb,var(--color-success) 12%, var(--color-surface));color:var(--color-success)}
+    .gene-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4)}
+    .gene-card{padding:var(--space-5);display:grid;gap:var(--space-4)}
+    .gene-card h3{margin:0;font-size:var(--text-lg)}
+    .gene-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3)}
+    .mini{padding:var(--space-3);border-radius:var(--radius-lg);background:var(--color-surface-offset)}
+    .mini strong{display:block;font-size:var(--text-base)}
+    .mini span{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.14em;color:var(--color-text-muted)}
+    .empty{padding:var(--space-12);text-align:center;border:1px dashed color-mix(in srgb,var(--color-text) 16%, transparent);border-radius:var(--radius-xl);background:var(--color-surface)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .footer-note{font-size:var(--text-sm);color:var(--color-text-muted)}
+    .hidden{display:none !important}
+    .pill{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem .8rem;border-radius:var(--radius-full);background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+    @media (max-width: 980px){
+      .hero-grid,.app-grid,.gene-grid,.metrics{grid-template-columns:1fr}
+      .panel{position:static}
+    }
+    @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none !important}}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+            <path d="M7.5 4.5c2.5 0 4.5 2 4.5 4.5S10 13.5 7.5 13.5 3 11.5 3 9s2-4.5 4.5-4.5Zm9 6c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5S12 17.5 12 15s2-4.5 4.5-4.5Zm-9 0H12m0-1.5V15"/>
+          </svg>
+        </div>
+        <div class="brand-copy"><strong>BaseRead</strong><span>Gene annotation workspace</span></div>
+      </a>
+      <button class="icon-btn" data-theme-toggle aria-label="Switch color mode">◐</button>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">FastAPI + HTML app</div>
+          <h1>From raw VCF to grounded gene interpretation.</h1>
+          <p>This HTML client pairs with a Python FastAPI backend to upload sequencing files, filter variants, generate structured annotations, and return gene-level summaries with export links.</p>
+          <div class="actions">
+            <a class="btn btn-primary" href="#workspace">Open workspace</a>
+            <a class="btn btn-secondary" href="#api-help">API wiring</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <span class="pill">MVP architecture</span>
+          <div class="hero-stats">
+            <div class="hero-stat"><strong>Upload</strong><span>VCF intake</span></div>
+            <div class="hero-stat"><strong>Annotate</strong><span>Server pipeline</span></div>
+            <div class="hero-stat"><strong>Export</strong><span>JSON + text</span></div>
+          </div>
+          <p class="muted">Built as a researcher-facing prototype. The backend currently uses a deterministic mock evidence layer so you can test the product flow before wiring ClinVar, gnomAD, OMIM, or VEP.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="workspace" class="app-grid" aria-label="BaseRead workspace">
+      <aside class="panel">
+        <h2>Run annotation</h2>
+        <p class="muted">Point this page at your FastAPI server, upload a VCF, and inspect gene-level output.</p>
+        <form id="annotateForm">
+          <div class="field">
+            <label for="apiBase">API base URL</label>
+            <input id="apiBase" name="apiBase" type="text" value="http://localhost:8000" aria-describedby="apiBaseHint">
+            <div id="apiBaseHint" class="footer-note">Example: http://localhost:8000</div>
+          </div>
+          <div class="field">
+            <label for="vcfFile">VCF file</label>
+            <input id="vcfFile" name="file" type="file" accept=".vcf,.txt" required>
+          </div>
+          <div class="field">
+            <label for="rarity">Max gnomAD AF</label>
+            <input id="rarity" name="rarity_max_af" type="number" min="0" max="1" step="0.0001" value="0.01">
+          </div>
+          <div class="field">
+            <label for="impact">Impact filter</label>
+            <select id="impact" name="impact_mode">
+              <option value="missense_plus" selected>Missense and above</option>
+              <option value="lof_only">Loss of function only</option>
+              <option value="synonymous_plus">Synonymous and above</option>
+              <option value="all">All variants</option>
+            </select>
+          </div>
+          <label class="check"><input id="clinicallyRelevant" name="only_clinically_relevant" type="checkbox" checked> Only keep clinically relevant classes</label>
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Analyze VCF</button>
+            <button class="btn btn-secondary" type="button" id="loadDemoBtn">Load demo VCF</button>
+          </div>
+        </form>
+
+        <div class="status-list" aria-live="polite" id="pipelineStatus">
+          <div class="status-item"><span>VCF parsed</span><span class="dot" data-step="parse"></span></div>
+          <div class="status-item"><span>Variant filtering</span><span class="dot" data-step="filter"></span></div>
+          <div class="status-item"><span>Gene annotation</span><span class="dot" data-step="annotate"></span></div>
+          <div class="status-item"><span>AI summary</span><span class="dot" data-step="summary"></span></div>
+        </div>
+      </aside>
+
+      <section class="results" aria-live="polite">
+        <div class="results-head">
+          <div>
+            <h2>Results</h2>
+            <p class="muted" id="resultsSubtitle">No run yet.</p>
+          </div>
+          <div class="actions hidden" id="exportActions">
+            <a class="btn btn-secondary" id="jsonLink" target="_blank" rel="noopener noreferrer">Open JSON</a>
+            <a class="btn btn-secondary" id="txtLink" target="_blank" rel="noopener noreferrer">Open report</a>
+          </div>
+        </div>
+
+        <div class="metrics hidden" id="metrics"></div>
+        <div class="table-card hidden" id="variantTableWrap"></div>
+        <div class="gene-grid hidden" id="geneGrid"></div>
+        <div class="empty" id="emptyState">
+          <h2>Upload a VCF to begin</h2>
+          <p class="muted">The backend returns structured variants, per-gene summaries, and exportable run output.</p>
+        </div>
+
+        <section id="api-help" class="hero-card">
+          <h2>Backend wiring</h2>
+          <p class="muted">Start the API with <span class="mono">uvicorn app:app --reload</span>, then use this HTML page as a lightweight client. The endpoint used here is <span class="mono">POST /api/annotate</span>.</p>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const html = document.documentElement;
+    const themeBtn = document.querySelector('[data-theme-toggle]');
+    let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    html.setAttribute('data-theme', theme);
+    themeBtn.addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', theme);
+    });
+
+    const form = document.getElementById('annotateForm');
+    const resultsSubtitle = document.getElementById('resultsSubtitle');
+    const metrics = document.getElementById('metrics');
+    const geneGrid = document.getElementById('geneGrid');
+    const tableWrap = document.getElementById('variantTableWrap');
+    const emptyState = document.getElementById('emptyState');
+    const exportActions = document.getElementById('exportActions');
+    const jsonLink = document.getElementById('jsonLink');
+    const txtLink = document.getElementById('txtLink');
+    const dots = [...document.querySelectorAll('.dot')];
+    const loadDemoBtn = document.getElementById('loadDemoBtn');
+
+    function resetStatus() {
+      dots.forEach(d => { d.classList.remove('done','live'); });
+    }
+    function markStatus(step, cls) {
+      const dot = document.querySelector(`[data-step="${step}"]`);
+      if (dot) dot.classList.add(cls);
+    }
+    function badgeClass(value) {
+      if (value === 'Pathogenic') return 'b-path';
+      if (value === 'Likely Pathogenic') return 'b-lp';
+      if (value === 'Benign') return 'b-benign';
+      return 'b-vus';
+    }
+    function showResults(data, apiBase) {
+      emptyState.classList.add('hidden');
+      metrics.classList.remove('hidden');
+      tableWrap.classList.remove('hidden');
+      geneGrid.classList.remove('hidden');
+      exportActions.classList.remove('hidden');
+
+      resultsSubtitle.textContent = `${data.filename} · ${data.sample} · ${data.variant_count} filtered variants across ${data.gene_count} genes`;
+      metrics.innerHTML = `
+        <article class="metric"><span>Run ID</span><strong>${data.run_id}</strong></article>
+        <article class="metric"><span>Variants</span><strong>${data.variant_count}</strong></article>
+        <article class="metric"><span>Genes</span><strong>${data.gene_count}</strong></article>
+        <article class="metric"><span>Rarity cutoff</span><strong>${data.filters.rarity_max_af}</strong></article>
+      `;
+
+      tableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr><th>Gene</th><th>Variant</th><th>ClinVar</th><th>gnomAD AF</th><th>Consequence</th><th>Sources</th></tr>
+          </thead>
+          <tbody>
+            ${data.variants.map(v => `
+              <tr>
+                <td><strong>${v.gene}</strong><br><span class="muted mono">${v.rsid}</span></td>
+                <td class="mono">${v.protein}<br>${v.variant_id}</td>
+                <td><span class="badge ${badgeClass(v.clinvar)}">${v.clinvar}</span></td>
+                <td>${v.gnomad_af}</td>
+                <td>${v.consequence}</td>
+                <td class="mono">ClinVar: ${v.source_records.clinvar}<br>gnomAD: ${v.source_records.gnomad}<br>OMIM: ${v.source_records.omim}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      geneGrid.innerHTML = data.genes.map(g => `
+        <article class="gene-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+            <h3>${g.gene}</h3>
+            <span class="badge ${badgeClass(g.top_variant.clinvar)}">${g.top_variant.clinvar}</span>
+          </div>
+          <div class="gene-meta">
+            <div class="mini"><span>Top variant</span><strong>${g.top_variant.protein}</strong></div>
+            <div class="mini"><span>gnomAD AF</span><strong>${g.top_variant.gnomad_af}</strong></div>
+            <div class="mini"><span>Consequence</span><strong>${g.top_variant.consequence}</strong></div>
+          </div>
+          <p>${g.ai_summary}</p>
+          <div class="footer-note mono">Sources: ClinVar ${g.sources.clinvar} · gnomAD ${g.sources.gnomad} · OMIM ${g.sources.omim}</div>
+        </article>
+      `).join('');
+
+      jsonLink.href = `${apiBase}/api/report/${data.run_id}.json`;
+      txtLink.href = `${apiBase}/api/report/${data.run_id}.txt`;
+    }
+
+    loadDemoBtn.addEventListener('click', async () => {
+      const demo = `##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n12\t112926890\trs28933386\tG\tA\t100\tPASS\tGENE=PTPN11;HGVSp=p.E76K;CSQ=missense_variant;CLNSIG=Pathogenic;GNOMAD_AF=0.0003\n13\t32316461\trs80359550\tA\tT\t100\tPASS\tGENE=BRCA2;HGVSp=p.K3326*;CSQ=stop_gained;CLNSIG=Likely_pathogenic;GNOMAD_AF=0.0008\n17\t7579472\trs121912651\tG\tA\t100\tPASS\tGENE=TP53;HGVSp=p.R248Q;CSQ=missense_variant;CLNSIG=Pathogenic;GNOMAD_AF=0.0001`;
+      const blob = new Blob([demo], { type: 'text/plain' });
+      const file = new File([blob], 'demo.vcf', { type: 'text/plain' });
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('vcfFile').files = dt.files;
+      resultsSubtitle.textContent = 'Demo VCF loaded. Ready to analyze.';
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resetStatus();
+      markStatus('parse', 'live');
+      const apiBase = document.getElementById('apiBase').value.replace(/\/$/, '');
+      const fileInput = document.getElementById('vcfFile');
+      if (!fileInput.files.length) {
+        resultsSubtitle.textContent = 'Choose a VCF file first.';
+        return;
+      }
+      const fd = new FormData();
+      fd.append('file', fileInput.files[0]);
+      fd.append('rarity_max_af', document.getElementById('rarity').value);
+      fd.append('impact_mode', document.getElementById('impact').value);
+      fd.append('only_clinically_relevant', document.getElementById('clinicallyRelevant').checked ? 'true' : 'false');
+
+      resultsSubtitle.textContent = 'Uploading and annotating…';
+      try {
+        const response = await fetch(`${apiBase}/api/annotate`, { method: 'POST', body: fd });
+        markStatus('parse', 'done');
+        markStatus('filter', 'done');
+        markStatus('annotate', 'live');
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.detail || 'Request failed');
+        }
+        const data = await response.json();
+        markStatus('annotate', 'done');
+        markStatus('summary', 'done');
+        showResults(data, apiBase);
+      } catch (err) {
+        resultsSubtitle.textContent = `Error: ${err.message}. Make sure the FastAPI server is running and CORS is enabled.`;
+      }
+    });
+  </script>
+</body>
+</html>
